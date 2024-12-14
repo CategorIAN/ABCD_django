@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+          /* Basic styling for the table */
+          table.nav-bar {
+              width: 100%;
+              table-layout: fixed;
+              background-color: #f2f2f2;
+              border-collapse: collapse;
+              text-align: center;
+          }
+
+          table.nav-bar td {
+              padding: 10px;
+          }
+
+          table.nav-bar td a {
+              text-decoration: none;
+              color: black;
+              font-weight: bold;
+          }
+
+          table.nav-bar td a:hover {
+              color: blue; /* Change color on hover */
+          }
+    </style>
+    <style>
+        .table {
+        table-layout: fixed;
+        width: 100%
+        }
+
+        .table th, .table td {
+          text-align: center; /* Ensure content is centered */
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+          .table th, .table td {
+            width: auto; /* Allow the columns to shrink */
+          }
+        }
+
+        @media (max-width: 768px) {
+          td, th {
+            font-size: 14px;
+          }
+        }
+
+        @media (max-width: 576px) {
+          td, th {
+            font-size: 12px;
+          }
+        }
+    </style>
+    <style>
+        @media (min-width: 992px) {
+          .mobile-navbar {
+            display: none;
+          }
+
+        }
+        @media (max-width: 991px) {
+          table.nav-bar {
+            display: none;
+          }
+
+          .mobile-navbar {
+            display: block;
+          }
+        }
+    </style>
+    {% block extra_head %}
+    {% endblock %}
+    <body>
+      <header>
+
+        <nav>
+          <table class="nav-bar">
+            <tr>
+              <td><a href = "{% url 'app:index' %}">Link 1</a></td>
+              <td><a href = "{% url 'app:index' %}">Link 2</a></td>
+              <td><a href = "{% url 'app:index' %}">Link 3</a></td>
+            </tr>
+          </table>
+        </nav>
+
+        <nav class="navbar mobile-navbar">
+          <div class="container-fluid">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a href = "{% url 'app:index' %}?sort=id_asc">Link 1</a>
+                </li>
+                <li class="nav-item">
+                  <a href = "{% url 'app:index' %}">Link 2</a>
+                </li>
+                <li class="nav-item">
+                  <td><a href = "{% url 'app:index' %}">Link 3</a></td>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+      </header>
+      <div class="content">
+        {% block content %}
+
+        {% endblock %}
+      </div>
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
