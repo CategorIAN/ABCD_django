@@ -15,7 +15,13 @@ def addPerson_get(request):
     return HttpResponseRedirect("/app/addPerson")
 
 def addRequest(request):
-    return render(request, 'app/addRequest.html', {'form': FormRequestForm()})
+    query = "SELECT * FROM person_general_due"
+    df = sql_scripts.readSQL(query)
+    context = {
+        'form': FormRequestForm(),
+        'df_html': df.to_html(classes='table table-striped table-hover', index=False)
+    }
+    return render(request, 'app/addRequest.html', context)
 
 def addRequest_get(request):
     data = FormRequestForm(request.POST).data
