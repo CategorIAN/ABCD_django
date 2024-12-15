@@ -9,6 +9,13 @@ def addPerson(name):
         cursor.execute(stmt)
     return execute
 
+def request(person, form, timestamp):
+    def execute(cursor):
+        stmt = (f"Insert INTO form_requests (Person, Form, Timestamp) VALUES "
+                        f"{(person, form, timestamp)};".replace("''", "NULL"))
+        cursor.execute(stmt)
+    return execute
+
 def executeSQL(commands):
     try:
         connection = psycopg2.connect(user = config("DB_USER"),

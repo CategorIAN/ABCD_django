@@ -1,0 +1,12 @@
+{% extends "app/base.html" %}
+<html lang="en">
+{% block content %}
+<form action="{% url 'app:addRequest_get' %}" method="post">
+    {% csrf_token %}
+    <div class="container mt-5">
+    {{ form }}
+    <input type="submit" name="request" value="Request Form Submission">
+    </div>
+</form>
+{% endblock %}
+</html>
