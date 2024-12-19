@@ -1,5 +1,5 @@
 from django import forms
-from .models import Person, FormRequests
+from .models import Person, FormRequests, Invitation
 import datetime
 
 
@@ -30,5 +30,10 @@ class FormRequestForm(forms.ModelForm):
         initial["timestamp"] = datetime.datetime.now().strftime("%Y-%m-%d")
         kwargs["initial"] = initial
         super().__init__(*args, **kwargs)
+
+class InvitationForm(forms.ModelForm):
+    class Meta:
+        model = Invitation
+        fields = "__all__"
 
 

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import newPersonForm, FormRequestForm
+from .forms import newPersonForm, FormRequestForm, InvitationForm
 from django.http import HttpResponseRedirect
 from . import sql_scripts
 
@@ -27,6 +27,15 @@ def addRequest_get(request):
     data = FormRequestForm(request.POST).data
     sql_scripts.executeSQL([sql_scripts.request(data["person"], data["form"], data["timestamp"])])
     return HttpResponseRedirect("/app/addRequest")
+
+def addInvitation(request):
+    context = {
+        'form': InvitationForm(),
+    }
+    return render(request, 'app/addInvitation.html', context)
+
+def addInvitation_get(request):
+    pass
 
 
 
