@@ -10,5 +10,5 @@ urlpatterns = [
     path("addRequest", views.addRequest, name="addRequest"),
     path("addRequest_get", views.addRequest_get, name="addRequest_get"),
     path("addInvitation", views.addInvitation, name="addInvitation"),
-    path("addInvitation_get", views.addInvitation_get, name="addInvitation_get"),
+    path("addInvitation_get/<event>/", views.addInvitation_get, name="addInvitation_get"),
 ]

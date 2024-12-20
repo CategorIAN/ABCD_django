@@ -51,6 +51,9 @@ class Event(models.Model):
         managed = False
         db_table = 'event'
 
+    def __str__(self):
+        return f"({self.eventid}) {self.game}@{self.timestamp}"
+
 class EventPlan(models.Model):
     name = models.CharField(primary_key=True, max_length=160)
     month = models.ForeignKey('Month', models.DO_NOTHING, db_column='month', blank=True, null=True)
@@ -71,13 +74,17 @@ class Games(models.Model):
         managed = False
         db_table = 'games'
 
+    def __str__(self):
+        return self.name
+
 class Invitation(models.Model):
     timestamp = models.DateTimeField(blank=True, null=True)
     person = models.ForeignKey('Person', models.DO_NOTHING, db_column='person', blank=True, null=True)
     event = models.ForeignKey(Event, models.DO_NOTHING, db_column='event', blank=True, null=True)
     response = models.BooleanField(blank=True, null=True)
     plus_ones = models.IntegerField(blank=True, null=True)
-    result = models.TextField(blank=True, null=True)  # This field type is a guess.
+    result_opts = [(x, x) for x in ['Going', 'Passed', 'Flaked', 'Waiting', 'To Redeem', 'Redeemed']]
+    result = models.CharField(choices=result_opts, null=True, blank=True)
 
     class Meta:
         managed = False

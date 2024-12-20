@@ -1,7 +1,10 @@
 from django.shortcuts import render
-from .forms import newPersonForm, FormRequestForm, InvitationForm
+from .forms import newPersonForm, FormRequestForm, InvitationForm, SimpleEventForm
+from .models import *
 from django.http import HttpResponseRedirect
 from . import sql_scripts
+from urllib.parse import urlencode
+from datetime import datetime, timedelta
 
 def index(request):
     return render(request, 'app/index.html')
@@ -29,13 +32,24 @@ def addRequest_get(request):
     return HttpResponseRedirect("/app/addRequest")
 
 def addInvitation(request):
+    event_id = request.GET.get('event_id')
+    t = None if event_id is None else (Event.objects.get(pk=event_id).timestamp-timedelta(weeks=1)).strftime('%Y-%m-%d')
     context = {
-        'form': InvitationForm(),
+        'event_form': SimpleEventForm(initial={'event': event_id}),
+        'invitation_form': InvitationForm(initial={'event': event_id, 'timestamp': t}),
+        'current_event_id': event_id,
     }
     return render(request, 'app/addInvitation.html', context)
 
-def addInvitation_get(request):
-    pass
+def addInvitation_get(request, event):
+    if "get_event" in request.POST:
+        event_id = SimpleEventForm(request.POST).data['event']
+        return HttpResponseRedirect(f"/app/addInvitation?{urlencode({'event_id': event_id})}")
+    if "invite" in request.POST:
+        data = InvitationForm(request.POST).data
+        input = {x: data[x] for x in ["event", "timestamp", "person", "response", "plus_ones", "result"]}
+        sql_scripts.executeSQL([sql_scripts.invite(**input)])
+        return HttpResponseRedirect(f"/app/addInvitation?{urlencode({'event_id': event})}")
 
 
 

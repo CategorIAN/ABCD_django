@@ -15,6 +15,13 @@ def request(person, form, timestamp):
         cursor.execute(stmt)
     return execute
 
+def invite(event, timestamp, person, response, plus_ones, result):
+    def execute(cursor):
+        stmt = (f"Insert INTO Invitation (Event, Timestamp, Person, Response, Plus_Ones, Result) VALUES "
+                f"{(event, timestamp, person, response, plus_ones, result)};").replace("''", "NULL")
+        cursor.execute(stmt)
+    return execute
+
 def queried_df(cursor, query):
     cursor.execute(query)
     columns = [column[0] for column in cursor.description]
