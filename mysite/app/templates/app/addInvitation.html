@@ -1,0 +1,22 @@
+{% extends "app/base.html" %}
+<html lang="en">
+{% block content %}
+<form action="{% url 'app:addInvitation_get' current_event_id %}" method="post">
+    {% csrf_token %}
+    <div class="container mt-5">
+        {{ event_form }}
+        <input type="submit" name="get_event" value="Select Event">
+    </div>
+</form>
+<form action="{% url 'app:addInvitation_get' current_event_id %}" method="post">
+    {% csrf_token %}
+    <div class="container mt-5">
+        {{ invitation_form }}
+        <input type="submit" name="invite" value="Invite to Event">
+    </div>
+</form>
+<div class="container mt-5">
+    {{ call_list | safe }}
+</div>
+{% endblock %}
+</html>
