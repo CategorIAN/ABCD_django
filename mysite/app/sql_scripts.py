@@ -35,7 +35,18 @@ def callList_view(event_id):
         print(type(event_plan))
         if event_plan == "None":
             stmt = f"""
-                    Select Person.Name, Redeem, New, CompletedSurvey, ExpectedAttendance, ExpectedInvite
+                    Select Person.Name, 
+                           EXISTS (
+                                SELECT 1
+                                FROM invitation
+                                where invitation.person = person.name
+                                and invitation.event = '{event_id}'
+                           ) AS Invited,
+                           Redeem, 
+                           New, 
+                           CompletedSurvey, 
+                           ExpectedAttendance, 
+                           ExpectedInvite
                     from Person Left Outer Join Person_Games on Person.name = Person_Games.PersonID
                     Left Outer Join Person_Timespan on Person.name = Person_Timespan.personid
                     Left Outer Join Person_Redeem on Person.name = Person_Redeem.name
@@ -43,10 +54,17 @@ def callList_view(event_id):
                     Left Outer Join Person_Expected on Person.name = Person_Expected.Name
                     Left Outer Join Person_Due on Person.name = Person_Due.name
                     Left Outer Join Event on Person_Games.gamesid = event.game and Person_Timespan.timespan = event.timespan
-                    Where (Redeem or (EventDue and InviteDue)) and 
-                            person.name != 'Ian Kessler' and Status = 'Active' and 
-                            (Not CompletedSurvey or EventId = '{event_id}')
-                    Order By Redeem Desc, New Desc, CompletedSurvey Desc, ExpectedAttendance, ExpectedInvite, Person.Name;
+                    Where (Person_Redeem.Redeem or (Person_Due.EventDue and Person_Due.InviteDue)) and 
+                            person.name != 'Ian Kessler' and Person.Status = 'Active' and 
+                            (Not Person_Completedsurvey.CompletedSurvey or Event.EventId = '{event_id}')
+                    Order By Invited,
+                             Redeem Desc, 
+                             New Desc, 
+                             CompletedSurvey Desc, 
+                             ExpectedAttendance, 
+                             ExpectedInvite, 
+                             Person.Name
+                             ;
                     """
         else:
             stmt = f"""
