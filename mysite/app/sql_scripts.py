@@ -3,24 +3,23 @@ from decouple import config
 import pandas as pd
 
 def addPerson(name):
-    def execute(cursor):
-        stmt = f"Insert INTO Person (Name, Status) Values ('{name}', 'Active');"
-        cursor.execute(stmt)
-    return execute
+    command = f"""
+    Insert INTO Person (Name, Status) Values ('{name}', 'Active');
+    """
+    return command
 
 def request(person, form, timestamp):
-    def execute(cursor):
-        stmt = (f"Insert INTO form_requests (Person, Form, Timestamp) VALUES "
-                        f"{(person, form, timestamp)};".replace("''", "NULL"))
-        cursor.execute(stmt)
-    return execute
+    command = f"""
+    Insert INTO form_requests (Person, Form, Timestamp) VALUES
+    {(person, form, timestamp)}
+    """.replace("''", "NULL")
+    return command
 
 def invite(event, timestamp, person, response, plus_ones, result):
-    def execute(cursor):
-        stmt = (f"Insert INTO Invitation (Event, Timestamp, Person, Response, Plus_Ones, Result) VALUES "
-                f"{(event, timestamp, person, response, plus_ones, result)};").replace("''", "NULL")
-        cursor.execute(stmt)
-    return execute
+    command = f"""
+    Insert INTO Invitation (Event, Timestamp, Person, Response, Plus_Ones, Result) VALUES
+    {(event, timestamp, person, response, plus_ones, result)};""".replace("''", "NULL")
+    return command
 
 def queried_df(cursor, query):
     cursor.execute(query)
@@ -28,46 +27,45 @@ def queried_df(cursor, query):
     data = [[str(x) for x in tuple(y)] for y in cursor.fetchall()]
     return pd.DataFrame(data=data, columns=columns)
 
+
 def callList_view(event_id):
     def execute(cursor):
         df = queried_df(cursor, f"Select event_plan from event where eventid = '{event_id}'")
         event_plan = df['event_plan'].iloc[0]
-        print(type(event_plan))
         if event_plan == "None":
-            stmt = f"""
-                    Select Person.Name, 
-                           EXISTS (
-                                SELECT 1
-                                FROM invitation
-                                where invitation.person = person.name
-                                and invitation.event = '{event_id}'
-                           ) AS Invited,
-                           Redeem, 
-                           New, 
-                           CompletedSurvey, 
-                           ExpectedAttendance, 
-                           ExpectedInvite
-                    from Person Left Outer Join Person_Games on Person.name = Person_Games.PersonID
-                    Left Outer Join Person_Timespan on Person.name = Person_Timespan.personid
-                    Left Outer Join Person_Redeem on Person.name = Person_Redeem.name
-                    Left Outer Join Person_CompletedSurvey on Person.name = Person_CompletedSurvey.name
-                    Left Outer Join Person_Expected on Person.name = Person_Expected.Name
-                    Left Outer Join Person_Due on Person.name = Person_Due.name
-                    Left Outer Join Event on Person_Games.gamesid = event.game and Person_Timespan.timespan = event.timespan
-                    Where (Person_Redeem.Redeem or (Person_Due.EventDue and Person_Due.InviteDue)) and 
-                            person.name != 'Ian Kessler' and Person.Status = 'Active' and 
-                            (Not Person_Completedsurvey.CompletedSurvey or Event.EventId = '{event_id}')
-                    Order By Invited,
-                             Redeem Desc, 
-                             New Desc, 
-                             CompletedSurvey Desc, 
-                             ExpectedAttendance, 
-                             ExpectedInvite, 
-                             Person.Name
-                             ;
-                    """
+            query = f"""
+            Select Person.Name, 
+                   EXISTS (
+                        SELECT 1
+                        FROM invitation
+                        where invitation.person = person.name
+                        and invitation.event = '{event_id}'
+                   ) AS Invited,
+                   Redeem, 
+                   New, 
+                   CompletedSurvey, 
+                   ExpectedAttendance, 
+                   ExpectedInvite
+            from Person Left Outer Join Person_Games on Person.name = Person_Games.PersonID
+            Left Outer Join Person_Timespan on Person.name = Person_Timespan.personid
+            Left Outer Join Person_Redeem on Person.name = Person_Redeem.name
+            Left Outer Join Person_CompletedSurvey on Person.name = Person_CompletedSurvey.name
+            Left Outer Join Person_Expected on Person.name = Person_Expected.Name
+            Left Outer Join Person_Due on Person.name = Person_Due.name
+            Left Outer Join Event on Person_Games.gamesid = event.game and Person_Timespan.timespan = event.timespan
+            Where (Person_Redeem.Redeem or (Person_Due.EventDue and Person_Due.InviteDue)) and 
+                    person.name != 'Ian Kessler' and Person.Status = 'Active' and 
+                    (Not Person_Completedsurvey.CompletedSurvey or Event.EventId = '{event_id}')
+            Order By Invited,
+                     Redeem Desc, 
+                     New Desc, 
+                     CompletedSurvey Desc, 
+                     ExpectedAttendance, 
+                     ExpectedInvite, 
+                     Person.Name
+            """
         else:
-            stmt = f"""
+            query = f"""
             Select Person.Name, Submitted_EPA, Redeem, ExpectedAttendance, ExpectedInvite
             from Person
             left join person_games on person.name = person_games.personid
@@ -98,14 +96,10 @@ def callList_view(event_id):
             group by Person.Name, Submitted_EPA, Redeem, ExpectedAttendance, ExpectedInvite
             order by submitted_epa desc, redeem desc, expectedattendance, expectedinvite, person.name
             """
-        return queried_df(cursor, stmt)
+        return queried_df(cursor, query)
     return execute
-"""
-Where (Redeem or (EventDue and InviteDue)) and 
-                person.name != 'Ian Kessler' and Status = 'Active' and 
-                (Not CompletedSurvey or EventId = '{event_id}')
-"""
-def executeSQL(commands):
+
+def executeSQL(*commands):
     try:
         connection = psycopg2.connect(user = config("DB_USER"),
                                       password = config("DB_PASSWORD"),
@@ -114,7 +108,7 @@ def executeSQL(commands):
                                       database = config("DB_NAME"))
         cursor = connection.cursor()
         for command in commands:
-            command(cursor)
+            cursor.execute(command)
         connection.commit()
 
     except psycopg2.Error as e:

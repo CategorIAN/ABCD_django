@@ -14,11 +14,11 @@ def addPerson(request):
 
 def addPerson_get(request):
     data = newPersonForm(request.POST).data
-    sql_scripts.executeSQL([sql_scripts.addPerson(data["name"])])
+    sql_scripts.executeSQL(sql_scripts.addPerson(data["name"]))
     return HttpResponseRedirect("/app/addPerson")
 
 def addRequest(request):
-    view = lambda cursor: sql_scripts.queried_df(cursor, "SELECT * FROM person_general_due")
+    view = lambda cursor: sql_scripts.queried_df(cursor, "SELECT * FROM PERSON_GENERAL_DUE")
     df = sql_scripts.readSQL(view)
     context = {
         'form': FormRequestForm(),
@@ -28,7 +28,7 @@ def addRequest(request):
 
 def addRequest_get(request):
     data = FormRequestForm(request.POST).data
-    sql_scripts.executeSQL([sql_scripts.request(data["person"], data["form"], data["timestamp"])])
+    sql_scripts.executeSQL(sql_scripts.request(data["person"], data["form"], data["timestamp"]))
     return HttpResponseRedirect("/app/addRequest")
 
 def addInvitation(request):
@@ -51,7 +51,7 @@ def addInvitation_get(request, event):
     if "invite" in request.POST:
         data = InvitationForm(request.POST).data
         input = {x: data[x] for x in ["event", "timestamp", "person", "response", "plus_ones", "result"]}
-        sql_scripts.executeSQL([sql_scripts.invite(**input)])
+        sql_scripts.executeSQL(sql_scripts.invite(**input))
         return HttpResponseRedirect(f"/app/addInvitation?{urlencode({'event_id': event})}")
 
 
