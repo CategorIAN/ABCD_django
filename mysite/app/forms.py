@@ -31,19 +31,30 @@ class FormRequestForm(forms.ModelForm):
         kwargs["initial"] = initial
         super().__init__(*args, **kwargs)
 
+class SimpleEventForm(forms.Form):
+    event = forms.ModelChoiceField(queryset=Event.objects.all().order_by("-eventid"), label="")
+
 class InvitationForm(forms.ModelForm):
     class Meta:
         model = Invitation
-        fields = ["event", "timestamp", "person", "response", "plus_ones", "result"]
+        fields = ["event", "timestamp", "person", "plus_ones", "result"]
+
+    person = forms.ModelChoiceField(queryset=Person.objects.all().order_by("name"), label="")
 
     timestamp = forms.DateField(
         input_formats=['%Y-%m-%d'],
         widget=forms.DateTimeInput(attrs={'type': 'date'})
     )
 
-    response = forms.NullBooleanField(
-        widget=forms.Select(choices=[(None, ''),(True, 'Yes'), (False, 'No')]), required=False)
+    result = forms.ChoiceField(
+        choices = [("", "--------")] + [(x, x) for x in ['Going', 'Flaked', 'To Redeem']]
+    )
 
-class SimpleEventForm(forms.Form):
-    event = forms.ModelChoiceField(queryset=Event.objects.all(), label="")
+    plus_ones = forms.IntegerField(initial=0)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["event"].widget = forms.HiddenInput()
+        self.fields["timestamp"].widget = forms.HiddenInput()
+
 

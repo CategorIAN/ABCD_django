@@ -4,8 +4,22 @@
 <form action="{% url 'app:addRequest_get' %}" method="post">
     {% csrf_token %}
     <div class="container mt-5">
-    {{ form }}
-    <input type="submit" name="request" value="Request Form Submission">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Person</th>
+                    <th>Form</th>
+                    <th>Timestamp</th>
+                    <th>Request?</th>
+                </tr>
+            </thead>
+            <tr>
+                <td>{{  form.person }}</td>
+                <td>{{ form.form }}</td>
+                <td>{{ form.timestamp }}</td>
+                <td><input type="submit" name="request" value="Request Form Submission"></td>
+            </tr>
+        </table>
     </div>
 </form>
 <div class="container mt-5">

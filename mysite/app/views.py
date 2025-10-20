@@ -20,8 +20,7 @@ def addPerson_get(request):
     return HttpResponseRedirect("/app/addPerson")
 
 def addRequest(request):
-    view = lambda cursor: sql_scripts.queried_df(cursor, "SELECT * FROM PERSON_GENERAL_DUE")
-    df = sql_scripts.readSQL(view)
+    df = readSQL("SELECT * FROM PERSON_GENERAL_DUE")
     context = {
         'form': FormRequestForm(),
         'df_html': df.to_html(classes='table table-striped table-hover', index=False)
@@ -60,8 +59,8 @@ def addInvitation_get(request, event):
         return HttpResponseRedirect(f"/app/addInvitation?{urlencode({'event_id': event_id})}")
     if "invite" in request.POST:
         data = InvitationForm(request.POST).data
-        input = {x: data[x] for x in ["event", "timestamp", "person", "response", "plus_ones", "result"]}
-        sql_scripts.executeSQL(sql_scripts.invite(**input))
+        input = {x: data[x] for x in ["event", "timestamp", "person", "plus_ones", "result"]}
+        executeSQL(invite(**input))
         return HttpResponseRedirect(f"/app/addInvitation?{urlencode({'event_id': event})}")
 
 

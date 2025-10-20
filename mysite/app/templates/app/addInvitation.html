@@ -4,19 +4,63 @@
 <form action="{% url 'app:addInvitation_get' current_event_id %}" method="post">
     {% csrf_token %}
     <div class="container mt-5">
-        {{ event_form }}
-        <input type="submit" name="get_event" value="Select Event">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Event</th>
+                    <th>Select Event?</th>
+                </tr>
+            </thead>
+            <tr>
+                <td>{{  event_form.event }}</td>
+                <td><input type="submit" name="get_event" value="Select Event"></td>
+            </tr>
+        </table>
     </div>
 </form>
 <form action="{% url 'app:addInvitation_get' current_event_id %}" method="post">
     {% csrf_token %}
     <div class="container mt-5">
-        {{ invitation_form }}
-        <input type="submit" name="invite" value="Invite to Event">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Person</th>
+                    <th>Plus Ones</th>
+                    <th>Result</th>
+                    <th>Invite To Event?</th>
+                </tr>
+            </thead>
+            <tr>
+                <td>{{  invitation_form.person }}</td>
+                <td>{{ invitation_form.plus_ones }}</td>
+                <td>{{ invitation_form.result }}</td>
+                <td><input type="submit" name="invite" value="Invite to Event"></td>
+            </tr>
+        </table>
     </div>
 </form>
-<div class="container mt-5">
+    <div class="container mt-5">
+<button id="call_list_button" class="btn btn-primary mb-3">Show Call List</button>
+    </div>
+
+<div id="call_list" class="container mt-5" style="display: none;">
     {{ call_list | safe }}
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const button = document.getElementById("call_list_button");
+    const container = document.getElementById("call_list");
+        button.addEventListener("click", function () {
+        if (container.style.display === "none") {
+            container.style.display = "block";
+            button.textContent = "Hide Call List";
+        } else {
+            container.style.display = "none";
+            button.textContent = "Show Call List";
+        }
+    });
+});
+</script>
+
 {% endblock %}
 </html>

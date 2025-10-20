@@ -17,10 +17,10 @@ def request(person, form, timestamp):
     """
     return command
 
-def invite(event, timestamp, person, response, plus_ones, result):
+def invite(event, timestamp, person, plus_ones, result):
     command = f"""
-    INSERT INTO INVITATION (EVENT, TIMESTAMP, PERSON, RESPONSE, PLUS_ONES, RESULT) VALUES
-    ({sqlTuple(event, timestamp, person, response, plus_ones, result)})
+    INSERT INTO INVITATION (EVENT, TIMESTAMP, PERSON, PLUS_ONES, RESULT) VALUES
+    ({sqlTuple(event, timestamp, person, plus_ones, result)})
     """
     return command
 

@@ -81,7 +81,6 @@ class Invitation(models.Model):
     timestamp = models.DateTimeField(blank=True, null=True)
     person = models.ForeignKey('Person', models.DO_NOTHING, db_column='person', blank=True, null=True)
     event = models.ForeignKey(Event, models.DO_NOTHING, db_column='event', blank=True, null=True)
-    response = models.BooleanField(blank=True, null=True)
     plus_ones = models.IntegerField(blank=True, null=True)
     result_opts = [(x, x) for x in ['Going', 'Passed', 'Flaked', 'Waiting', 'To Redeem', 'Redeemed']]
     result = models.CharField(choices=result_opts, null=True, blank=True)
