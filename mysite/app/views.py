@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .forms import newPersonForm, FormRequestForm, InvitationForm, SimpleEventForm
 from .models import *
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from . import sql_scripts
 from urllib.parse import urlencode
 from datetime import datetime, timedelta
@@ -11,13 +11,18 @@ from .sql_scripts import *
 def index(request):
     return render(request, 'app/index.html')
 
-def addPerson(request):
-    return render(request, 'app/addPerson.html', {'form': newPersonForm()})
+def updatePerson(request):
+    return render(request, 'app/updatePerson.html', {'form': newPersonForm()})
 
-def addPerson_get(request):
-    data = newPersonForm(request.POST).data
-    sql_scripts.executeSQL(sql_scripts.addPerson(data["name"]))
-    return HttpResponseRedirect("/app/addPerson")
+def updatePerson_get(request):
+    if "add" in request.POST:
+        data = newPersonForm(request.POST).data
+        executeSQL(addPerson(data["name"]))
+        return HttpResponseRedirect("/app/updatePerson")
+    if "delete" in request.POST:
+        data = newPersonForm(request.POST).data
+        executeSQL(*deletePerson(data["name"]))
+        return HttpResponseRedirect("/app/updatePerson")
 
 def addRequest(request):
     df = readSQL("SELECT * FROM PERSON_GENERAL_DUE")
@@ -36,20 +41,12 @@ def addInvitation(request):
     event_id = request.GET.get('event_id')
     t = None if event_id is None else (Event.objects.get(pk=event_id).timestamp-timedelta(weeks=1)).strftime('%Y-%m-%d')
     settings = {"classes": 'table table-striped table-hover', 'index': False}
-    if event_id is None:
-        call_list = ""
-    else:
-        df = readSQL(f"Select event_plan from event where eventid = '{event_id}'")
-        event_plan = df['event_plan'].iloc[0]
-        if event_plan == "None":
-            call_list = readSQL(callList(event_id)).to_html(**settings)
-        else:
-            call_list = readSQL(plannedCallList(event_id)).to_html(**settings)
+    call_list_html = "" if event_id is None else callListDF(event_id).to_html(**settings)
     context = {
         'event_form': SimpleEventForm(initial={'event': event_id}),
         'invitation_form': InvitationForm(initial={'event': event_id, 'timestamp': t}),
         'current_event_id': event_id,
-        'call_list': call_list
+        'call_list': call_list_html
     }
     return render(request, 'app/addInvitation.html', context)
 
@@ -62,6 +59,17 @@ def addInvitation_get(request, event):
         input = {x: data[x] for x in ["event", "timestamp", "person", "plus_ones", "result"]}
         executeSQL(invite(**input))
         return HttpResponseRedirect(f"/app/addInvitation?{urlencode({'event_id': event})}")
+    if "call_list" in request.POST:
+        df = callListDF(event)
+        checkboxes = df.shape[0] * [{col: False for col in ['Invited', 'Going',
+                                                            'Plus One', 'Waiting', 'Declined', 'Flaked']}]
+        call_list = pd.concat([df['name'], pd.DataFrame(checkboxes), df.loc[:, df.columns != 'name']], axis=1)
+        print(call_list)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="call_list_{event}.csv"'
+        call_list.to_csv(path_or_buf=response, index=False)
+        return response
+
 
 
 

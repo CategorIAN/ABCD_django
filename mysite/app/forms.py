@@ -24,6 +24,8 @@ class FormRequestForm(forms.ModelForm):
         widget=forms.DateTimeInput(attrs={'type': 'date'})
     )
 
+    person = forms.ModelChoiceField(queryset=Person.objects.all().order_by("name"), label="")
+
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
         initial["form"] = "ABCD General Survey"

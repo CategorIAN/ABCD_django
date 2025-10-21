@@ -44,6 +44,10 @@
     </div>
 
 <div id="call_list" class="container mt-5" style="display: none;">
+    <form action="{% url 'app:addInvitation_get' current_event_id %}" method="post">
+        {% csrf_token %}
+    <input type="submit" name="call_list" value="Get Call List">
+    </form>
     {{ call_list | safe }}
 </div>
 <script>

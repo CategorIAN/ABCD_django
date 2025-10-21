@@ -11,6 +11,15 @@ def addPerson(name, status = 'Active'):
     """
     return command
 
+def deletePerson(name):
+    invites = f"DELETE FROM INVITATION WHERE PERSON = '{name}';"
+    form_requests = f"DELETE FROM FORM_REQUESTS WHERE PERSON = '{name}';"
+    form_submissions = f"DELETE FROM FORM_SUBMISSIONS WHERE PERSON = '{name}';"
+    eventplan_availability = f"DELETE FROM PERSON_EVENTPLAN_AVAILABILITY WHERE PERSONID = '{name}';"
+    person = f"DELETE FROM PERSON WHERE NAME = '{name}';"
+    delete_stmts = [invites, form_requests, form_submissions, eventplan_availability, person]
+    return delete_stmts
+
 def request(person, form, timestamp):
     command = f"""
     INSERT INTO FORM_REQUESTS (PERSON, FORM, TIMESTAMP) VALUES ({sqlTuple(person, form, timestamp)})
@@ -97,16 +106,17 @@ def plannedCallList(event_id):
             where event_planned.eventid = '{event_id}' 
             and (
                     (
-                        person_completedepa.submitted_epa and 
-                        person_eventplan_timespan.eventplanid = event_planned.event_plan and
-                        person_eventplan_timespan.timespan = event_planned.timespan and
-                        person_eventplan_timespan.week = event_planned.week
+                        person_completedepa.submitted_epa
+                        and person_eventplan_timespan.eventplanid = event_planned.event_plan
+                        and person_eventplan_timespan.timespan = event_planned.timespan
+                        and person_eventplan_timespan.week = event_planned.week
                     ) or 
                     (   
-                        not person_completedepa.submitted_epa and 
-                        event_general.eventid = '{event_id}' and 
-                        (redeem or (eventdue and invitedue)) and
-                        person.name != 'Ian Kessler' and status = 'Active'
+                        not person_completedepa.submitted_epa 
+                        and event_general.eventid = '{event_id}' 
+                        and (redeem or (eventdue and invitedue))
+                        and person.name != 'Ian Kessler' 
+                        and status = 'Active'
                     )
             ) 
             group by Person.Name, 
@@ -121,6 +131,11 @@ def plannedCallList(event_id):
                     person.name
     """
     return query
+
+def callListDF(event_id):
+    df = readSQL(f"Select event_plan from event where eventid = '{event_id}'")
+    event_plan = df['event_plan'].iloc[0]
+    return readSQL(callList(event_id)) if event_plan == "None" else readSQL(plannedCallList(event_id))
 
 
 def executeSQL(*commands):
