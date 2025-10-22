@@ -60,3 +60,11 @@ class InvitationForm(forms.ModelForm):
         self.fields["timestamp"].widget = forms.HiddenInput()
 
 
+class PersonForm(forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = ["name"]
+
+    name = forms.ModelChoiceField(queryset=Person.objects.all().order_by("name"), label="")
+
+

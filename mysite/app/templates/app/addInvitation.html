@@ -39,9 +39,9 @@
         </table>
     </div>
 </form>
-    <div class="container mt-5">
+<div class="container mt-5">
 <button id="call_list_button" class="btn btn-primary mb-3">Show Call List</button>
-    </div>
+</div>
 
 <div id="call_list" class="container mt-5" style="display: none;">
     <form action="{% url 'app:addInvitation_get' current_event_id %}" method="post">
@@ -50,6 +50,15 @@
     </form>
     {{ call_list | safe }}
 </div>
+
+<div class="container mt-5">
+<button id="meal_stats_button" class="btn btn-primary mb-3">Show Meal Stats</button>
+</div>
+
+<div id="meal_stats" class="container mt-5" style="display: none;">
+    {{ meal_stats | safe }}
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const button = document.getElementById("call_list_button");
@@ -61,6 +70,21 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             container.style.display = "none";
             button.textContent = "Show Call List";
+        }
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const button = document.getElementById("meal_stats_button");
+    const container = document.getElementById("meal_stats");
+        button.addEventListener("click", function () {
+        if (container.style.display === "none") {
+            container.style.display = "block";
+            button.textContent = "Hide Meal Stats";
+        } else {
+            container.style.display = "none";
+            button.textContent = "Show Meal Stats";
         }
     });
 });

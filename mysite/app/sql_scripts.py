@@ -5,6 +5,14 @@ import pandas as pd
 def sqlTuple(*fields):
     return ', '.join([f"'{field}'" for field in fields])
 
+def sqlColumns(cols):
+    return ",\n".join([col for col in cols])
+
+def df_vals(df):
+    insert_row = lambda i: ", ".join([f"'{str(val)}'" for val in ['ABCD General Survey'] + list(df.loc[i, :])])
+    data = ",\n".join([f"({insert_row(i)})" for i in df.index])
+    return data.replace("'nan'", "NULL")
+
 def addPerson(name, status = 'Active'):
     command = f"""
     INSERT INTO PERSON (NAME, STATUS) VALUES ({sqlTuple(name, status)})
@@ -136,6 +144,59 @@ def callListDF(event_id):
     df = readSQL(f"Select event_plan from event where eventid = '{event_id}'")
     event_plan = df['event_plan'].iloc[0]
     return readSQL(callList(event_id)) if event_plan == "None" else readSQL(plannedCallList(event_id))
+
+def mealInterest(event_id):
+    query = f"""
+    --(Begin 2)---------------------------------------------------------------------------------------------------------
+    SELECT NAME AS MEAL,
+            COALESCE(COUNT(PERSON), 0) AS NUMBERINTERESTED
+    FROM (
+    --(Begin 1)---------------------------------------------------------------------------------------------------------
+    SELECT DISTINCT MEALS.NAME,
+            invitation.person
+    FROM meals
+    LEFT JOIN PERSON_MEALS ON MEALS.NAME = PERSON_MEALS.MEALSID
+    LEFT JOIN INVITATION 
+    ON PERSON_MEALS.PERSONID = INVITATION.person
+    and INVITATION.EVENT = '{event_id}'
+    AND INVITATION.RESULT = 'Going'
+    --(End 1)-----------------------------------------------------------------------------------------------------------
+    ) AS X
+    GROUP BY MEAL
+    --(End 2)-----------------------------------------------------------------------------------------------------------
+    """
+    return query
+
+def mealWeightedCount():
+    query = f"""
+    --(Begin 2)---------------------------------------------------------------------------------------------------------
+    SELECT NAME AS MEAL,
+            ROUND(COUNT(EVENTID) / WEIGHT::NUMERIC, 2) AS WEIGHTEDCOUNT
+    FROM (
+    --(Begin 1)---------------------------------------------------------------------------------------------------------
+    SELECT DISTINCT MEALS.NAME,
+            MEALS.WEIGHT,
+            EVENT.EVENTID
+    FROM MEALS
+    LEFT JOIN EVENT ON MEALS.NAME = EVENT.MEAL
+    WHERE EVENT.HAPPENED = TRUE
+    --(End 1)-----------------------------------------------------------------------------------------------------------
+    ) AS X  
+    GROUP BY NAME, WEIGHT
+    --(End 2)-----------------------------------------------------------------------------------------------------------
+    """
+    return query
+
+def mealStats(event_id):
+    query = f"""
+    SELECT X.MEAL,
+            NUMBERINTERESTED,
+            WEIGHTEDCOUNT
+    FROM ({mealInterest(event_id)}) AS X  
+    JOIN ({mealWeightedCount()}) AS Y ON X.MEAL = Y.MEAL
+    ORDER BY NUMBERINTERESTED DESC, WEIGHTEDCOUNT
+    """
+    return query
 
 
 def executeSQL(*commands):

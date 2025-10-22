@@ -33,3 +33,6 @@ Thumbs.db
 *.tmp
 *.swp
 *.~*
+
+EventPlanAvailability_DB/original.csv
+General_DB/original.csv
