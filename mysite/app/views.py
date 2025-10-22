@@ -75,12 +75,11 @@ def addInvitation_get(request, event):
 #=======================================================================================================================
 def personalProfile(request):
     person = request.GET.get('person')
-    info = Person(person)
-    data = "\n".join([info.readText(), info.readLinScale(), info.readMultChoice(), info.readCheckBox()])
+    person_obj = Person(person)
     context = {
         'person': person,
         'person_form': PersonForm(initial={'name': person}),
-        'data': data
+        'data': person_obj.readAll()
     }
     return render(request, 'app/PersonProfile.html', context)
 

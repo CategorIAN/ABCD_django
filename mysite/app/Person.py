@@ -44,7 +44,7 @@ class Person:
                 {sqlColumns(columns["name"])}
         FROM PERSON
         {self.filter('NAME')}
-        ORDER BY NAME
+        ORDER BY NAME, {sqlColumns(columns["name"])}
         """
         return self.html_data("Text", readSQL(query).to_html(**self.settings))
 
@@ -55,7 +55,7 @@ class Person:
                 {sqlColumns(columns["name"])}
         FROM PERSON
         {self.filter('NAME')}
-        ORDER BY NAME
+        ORDER BY NAME, {sqlColumns(columns["name"])}
         """
         return self.html_data("Liner Scale", readSQL(query).to_html(**self.settings))
 
@@ -66,7 +66,7 @@ class Person:
                 {sqlColumns(columns["name"])}
         FROM PERSON
         {self.filter('NAME')}
-                ORDER BY NAME
+        ORDER BY NAME, {sqlColumns(columns["name"])}
         """
         return self.html_data("Multiple Choice", readSQL(query).to_html(**self.settings))
 
@@ -81,11 +81,39 @@ class Person:
         SELECT * 
         FROM PERSON_{name} 
         {self.filter('PERSONID')}
-        ORDER BY PERSONID
+        ORDER BY PERSONID, {name}ID
         """)
         table_data = lambda name: self.html_data(name, table(name).to_html(**self.settings), "green")
         data = "\n".join([table_data(name) for name in columns["name"]])
         return self.html_data("Checkboxes", data)
 
+    def readGrid(self):
+        columns = readSQL("""
+        SELECT NAME 
+        FROM FORM_QUESTION 
+        WHERE FORM = 'ABCD General Survey' AND TYPE = 'Checkbox Grid'
+        ORDER BY NAME
+        """)
+        table = lambda name: readSQL(f"""
+        SELECT PERSONID,
+               COLUMNNAME,
+               ROWNAME
+        FROM PERSON_{name}
+        JOIN {name} ON PERSON_{name}.{name}ID = {name}.ID
+        JOIN {name}_COLUMN ON {name}.COLUMNID = {name}_COLUMN.COLUMNID
+        JOIN {name}_ROW ON {name}.ROWID = {name}_ROW.ROWID
+        {self.filter('PERSONID')}
+        ORDER BY PERSONID, {name}_COLUMN.COLUMNID, {name}_ROW.ROWID
+        """)
+        table_data = lambda name: self.html_data(name, table(name).to_html(**self.settings), "green")
+        data = "\n".join([table_data(name) for name in columns["name"]])
+        return self.html_data("Checkbox Grid", data)
+
+    def readAll(self):
+        return "\n".join([self.readText(),
+                         self.readLinScale(),
+                          self.readMultChoice(),
+                          self.readCheckBox(),
+                          self.readGrid()])
 
 
