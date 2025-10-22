@@ -67,17 +67,14 @@ def callList(event_id):
             Left Join Person_Redeem on Person.name = Person_Redeem.name
             Left Join Person_CompletedSurvey on Person.name = Person_CompletedSurvey.name
             Left Join Person_Expected on Person.name = Person_Expected.Name
-            Left Join Person_Due on Person.name = Person_Due.name
             Left Join Event on Person_Games.gamesid = event.game and Person_Timespan.timespan = event.timespan
             Where (
                     Person_Redeem.Redeem or 
                     (
-                    Person_Due.EventDue 
-                    and Person_Due.InviteDue
+                    Person_Expected.EventDue 
+                    and Person_Expected.InviteDue
                     )
                     ) 
-                and person.name != 'Ian Kessler' 
-                and Person.Status = 'Active'
                 and (
                     Not Person_Completedsurvey.CompletedSurvey 
                     or Event.EventId = '{event_id}'
@@ -105,7 +102,6 @@ def plannedCallList(event_id):
             left join person_redeem on person.name = person_redeem.name
             left join person_completedepa on person.name = person_completedepa.name
             left join person_expected on person.name = person_expected.name
-            left join person_due on person.name = person_due.name
             left join person_eventplan_timespan on person.name = person_eventplan_timespan.personid
             Left Join event as event_general on 
                 person_games.gamesid = event_general.game and 
@@ -123,8 +119,6 @@ def plannedCallList(event_id):
                         not person_completedepa.submitted_epa 
                         and event_general.eventid = '{event_id}' 
                         and (redeem or (eventdue and invitedue))
-                        and person.name != 'Ian Kessler' 
-                        and status = 'Active'
                     )
             ) 
             group by Person.Name, 
