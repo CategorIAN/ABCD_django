@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import newPersonForm, FormRequestForm, InvitationForm, SimpleEventForm, PersonForm
+from .forms import newPersonForm, FormRequestForm, InvitationForm, SimpleEventForm, PersonForm, GameForm
 from .models import *
 from django.http import HttpResponseRedirect, HttpResponse
 from . import sql_scripts
@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 from datetime import datetime, timedelta
 from .sql_scripts import *
 from .Person import Person
+from .Game import Game
 
 
 def index(request):
@@ -86,6 +87,24 @@ def personalProfile(request):
 def personalProfile_get(request, person):
     person_id = PersonForm(request.POST).data['name']
     return HttpResponseRedirect(f"/app/personalProfile?{urlencode({'person': person_id})}")
+#=======================================================================================================================
+def games(request):
+    games_df = readSQL("SELECT * FROM GAME_STATS")
+    game = request.GET.get('game')
+    game_obj = Game(game)
+    context = {
+        'games_df': games_df.to_html(classes='table table-striped table-hover', index=False),
+        'game': game,
+        'game_form': GameForm(initial={'name': game}),
+        'data': game_obj.allData()
+    }
+    return render(request, 'app/games.html', context)
+
+def games_get(request, game):
+    game_id = GameForm(request.POST).data['name']
+    return HttpResponseRedirect(f"/app/games?{urlencode({'game': game_id})}")
+
+
 
 
 

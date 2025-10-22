@@ -1,5 +1,5 @@
 from django import forms
-from .models import Person, FormRequests, Invitation, Event
+from .models import Person, FormRequests, Invitation, Event, Games
 import datetime
 
 
@@ -66,5 +66,13 @@ class PersonForm(forms.ModelForm):
         fields = ["name"]
 
     name = forms.ModelChoiceField(queryset=Person.objects.all().order_by("name"), label="")
+
+
+class GameForm(forms.ModelForm):
+    class Meta:
+        model = Games
+        fields = ["name"]
+
+    name = forms.ModelChoiceField(queryset=Games.objects.all().order_by("name"), label="")
 
 

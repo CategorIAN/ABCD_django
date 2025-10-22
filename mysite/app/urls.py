@@ -13,4 +13,6 @@ urlpatterns = [
     path("addInvitation_get/<event>/", views.addInvitation_get, name="addInvitation_get"),
     path("personalProfile", views.personalProfile, name="personalProfile"),
     path("personalProfile_get/<person>/", views.personalProfile_get, name="personalProfile_get"),
+    path("games", views.games, name="games"),
+    path("games_get/<game>/", views.games_get, name="games_get"),
 ]
