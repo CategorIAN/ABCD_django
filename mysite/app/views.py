@@ -103,6 +103,10 @@ def games(request):
 def games_get(request, game):
     game_id = GameForm(request.POST).data['name']
     return HttpResponseRedirect(f"/app/games?{urlencode({'game': game_id})}")
+#=======================================================================================================================
+def event_plans(request):
+    event_plan = request.GET.get('event_plan')
+
 
 
 

@@ -48,9 +48,7 @@ class InvitationForm(forms.ModelForm):
         widget=forms.DateTimeInput(attrs={'type': 'date'})
     )
 
-    result = forms.ChoiceField(
-        choices = [("", "--------")] + [(x, x) for x in ['Going', 'Flaked', 'To Redeem']]
-    )
+
 
     plus_ones = forms.IntegerField(initial=0)
 

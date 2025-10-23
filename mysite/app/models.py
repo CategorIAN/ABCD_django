@@ -82,8 +82,8 @@ class Invitation(models.Model):
     person = models.ForeignKey('Person', models.DO_NOTHING, db_column='person', blank=True, null=True)
     event = models.ForeignKey(Event, models.DO_NOTHING, db_column='event', blank=True, null=True)
     plus_ones = models.IntegerField(blank=True, null=True)
-    result_opts = [(x, x) for x in ['Going', 'Passed', 'Flaked', 'Waiting', 'To Redeem', 'Redeemed']]
-    result = models.CharField(choices=result_opts, null=True, blank=True)
+    result_opts = [(x, x) for x in ['Pending/Declined', 'Attending/Attended', 'Flaked', 'Waiting']]
+    result = models.CharField(choices=result_opts, default='Pending/Declined')
 
     class Meta:
         managed = False

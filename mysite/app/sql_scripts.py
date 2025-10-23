@@ -153,7 +153,7 @@ def mealInterest(event_id):
     LEFT JOIN INVITATION 
     ON PERSON_MEALS.PERSONID = INVITATION.person
     and INVITATION.EVENT = '{event_id}'
-    AND INVITATION.RESULT = 'Going'
+    AND INVITATION.RESULT = 'Attending/Attended'
     --(End 1)-----------------------------------------------------------------------------------------------------------
     ) AS X
     GROUP BY MEAL
