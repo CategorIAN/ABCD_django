@@ -65,6 +65,10 @@ class EventPlan(models.Model):
         managed = False
         db_table = 'event_plan'
 
+    def __str__(self):
+        return self.name
+
+
 class Games(models.Model):
     name = models.CharField(primary_key=True, max_length=160)
     other = models.BooleanField(blank=True, null=True)

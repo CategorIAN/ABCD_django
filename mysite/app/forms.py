@@ -1,5 +1,5 @@
 from django import forms
-from .models import Person, FormRequests, Invitation, Event, Games
+from .models import Person, FormRequests, Invitation, Event, Games, EventPlan
 import datetime
 
 
@@ -18,12 +18,10 @@ class FormRequestForm(forms.ModelForm):
     class Meta:
         model = FormRequests
         fields = "__all__"
-
     timestamp = forms.DateField(
         input_formats=['%Y-%m-%d'],
         widget=forms.DateTimeInput(attrs={'type': 'date'})
     )
-
     person = forms.ModelChoiceField(queryset=Person.objects.all().order_by("name"), label="")
 
     def __init__(self, *args, **kwargs):
@@ -40,37 +38,33 @@ class InvitationForm(forms.ModelForm):
     class Meta:
         model = Invitation
         fields = ["event", "timestamp", "person", "plus_ones", "result"]
-
     person = forms.ModelChoiceField(queryset=Person.objects.all().order_by("name"), label="")
-
     timestamp = forms.DateField(
         input_formats=['%Y-%m-%d'],
         widget=forms.DateTimeInput(attrs={'type': 'date'})
     )
-
-
-
     plus_ones = forms.IntegerField(initial=0)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["event"].widget = forms.HiddenInput()
         self.fields["timestamp"].widget = forms.HiddenInput()
 
-
 class PersonForm(forms.ModelForm):
     class Meta:
         model = Person
         fields = ["name"]
-
     name = forms.ModelChoiceField(queryset=Person.objects.all().order_by("name"), label="")
-
 
 class GameForm(forms.ModelForm):
     class Meta:
         model = Games
         fields = ["name"]
-
     name = forms.ModelChoiceField(queryset=Games.objects.all().order_by("name"), label="")
+
+class EventPlanForm(forms.ModelForm):
+    class Meta:
+        model = EventPlan
+        fields = ["name"]
+    name = forms.ModelChoiceField(queryset=EventPlan.objects.all().order_by("-year", "-month", "name"), label="")
 
 

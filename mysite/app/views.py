@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import newPersonForm, FormRequestForm, InvitationForm, SimpleEventForm, PersonForm, GameForm
+from .forms import newPersonForm, FormRequestForm, InvitationForm, SimpleEventForm, PersonForm, GameForm, EventPlanForm
 from .models import *
 from django.http import HttpResponseRedirect, HttpResponse
 from . import sql_scripts
@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from .sql_scripts import *
 from .Person import Person
 from .Game import Game
+from .Event_Plan import Event_Plan
 
 
 def index(request):
@@ -106,6 +107,18 @@ def games_get(request, game):
 #=======================================================================================================================
 def event_plans(request):
     event_plan = request.GET.get('event_plan')
+    event_plan_obj = Event_Plan(event_plan)
+    context = {
+        'event_plan': event_plan,
+        'event_plan_form': EventPlanForm(initial={'name': event_plan}),
+        'data': event_plan_obj.allData()
+    }
+    return render(request, 'app/event_plans.html', context)
+
+def event_plans_get(request, event_plan):
+    event_plan_id = EventPlanForm(request.POST).data['name']
+    return HttpResponseRedirect(f"/app/eventplans?{urlencode({'event_plan': event_plan_id})}")
+
 
 
 

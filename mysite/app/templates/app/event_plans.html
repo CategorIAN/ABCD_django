@@ -1,0 +1,23 @@
+{% extends "app/base.html" %}
+<html lang="en">
+{% block content %}
+<form action="{% url 'app:event_plans_get' event_plan %}" method="post">
+    {% csrf_token %}
+    <div class="container mt-5">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Event Plan</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tr>
+                <td>{{  event_plan_form.name }}</td>
+                <td><input type="submit" name="game" value="Select Event Plan"></td>
+            </tr>
+        </table>
+    </div>
+</form>
+        {{ data | safe }}
+{% endblock %}
+</html>

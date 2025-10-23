@@ -15,4 +15,6 @@ urlpatterns = [
     path("personalProfile_get/<person>/", views.personalProfile_get, name="personalProfile_get"),
     path("games", views.games, name="games"),
     path("games_get/<game>/", views.games_get, name="games_get"),
+    path("eventplans", views.event_plans, name="event_plans"),
+    path("eventplans_get/<event_plan>/", views.event_plans_get, name="event_plans_get"),
 ]
